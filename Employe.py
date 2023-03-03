@@ -10,6 +10,26 @@ class Employe(Personne):
         self.dateArret = dateArret
 
 """Employe toString method"""
+# Setters
+def setNoEmploye(self, noEmploye):
+    self.noEmploye = noEmploye
+def setNAS(self, nAS):
+    self.nAS = nAS
+def setDateEmbauche(self, dateEmbauche):
+    self.dateEmbauche = dateEmbauche
+def setDateArret(self, dateArret):
+    self.dateArret = dateArret
+
+# Getters
+def getNoEmploye(self):
+    return self.noEmploye
+def getNAS(self):
+    return self.nAS
+def getDateEmbauche(self):
+    return self.dateEmbauche
+def getDateArret(self):
+    return self.dateArret
+
 def __str__(self):
     return f"{self.noEmploye} {self.nom} {self.prenom} {self.ville} {self.province} {self.code_postal} {self.telephone} {self.courriel} {self.nAS} {self.dateEmbauche} {self.dateArret}"
 

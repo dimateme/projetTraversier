@@ -6,6 +6,20 @@ class Client(Personne):
         self.numeroIdentification = numeroIdentification
         self.sexe = sexe
         self.dateNaissance = dateNaissance
+# Setters
+    def setNumeroIdentification(self, numeroIdentification):
+        self.numeroIdentification = numeroIdentification
+    def setSexe(self, sexe):
+        self.sexe = sexe
+    def setDateNaissance(self, dateNaissance):
+        self.dateNaissance = dateNaissance
+# Getters
+    def getNumeroIdentification(self):
+        return self.numeroIdentification
+    def getSexe(self):
+        return self.sexe
+    def getDateNaissance(self):
+        return self.dateNaissance
 # création de la méthode ToString
     def __str__(self):
         return f"{self.numeroIdentification} {self.nom} {self.prenom} {self.ville} {self.province} {self.code_postal} {self.telephone} {self.courriel} {self.sexe} {self.dateNaissance}"
