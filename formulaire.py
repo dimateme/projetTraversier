@@ -1,12 +1,13 @@
 import sys
 from datetime import datetime
 import datetime
-
+from PyQt5.QtCore import QDate, QTime, QDateTime, Qt
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QDialog,QMessageBox
 from PyQt5 import uic
 
-from Traversier import Traversier
+from traverse import Traverse
+from traversier import Traversier
 from client import Client
 from employe import Employe
 from xml.etree import ElementTree as ET
@@ -65,14 +66,27 @@ class Formulaire(QtWidgets.QMainWindow):
         self.btnAjouterClient.clicked.connect(self.ajouterClient)
         self.asVehicule.stateChanged.connect(self.afficherFormulaireVehicule)
         self.btnAjouterVehicule.clicked.connect(self.ajouterVehicule)
+        self.btnAjouterTraverse.clicked.connect(self.ajouterTraverse)
         self.etatFormulaireVehicule()
+        self.heure=QTime.currentTime()
+        self.edtHeureTraverse.setTime(self.heure)
+        self.clients = []
+        self.employes = []
+        self.nomTraversier = None
+        self.numeroTraverse = None
         self.show()
 
-        self.employes = []
-        # methode qui permet d'enregistrer les informations d'un employe dans un fichier xml
 
 
-        # methode qui permet d'ajouter un un traversier
+
+
+
+
+
+
+
+
+    # methode qui permet d'ajouter un un traversier
     def ajouterTraversier(self):
         nomTraversier = self.edtNomTraversier.text()
         capaciteVehicule = self.edtCapaciteVehicule.text()
@@ -81,28 +95,12 @@ class Formulaire(QtWidgets.QMainWindow):
         dateMiseService = self.dateMiseService.text()
 
         self.traversier = Traversier(nomTraversier, capaciteVehicule, capacitePersonne, anneeFabrication, dateMiseService)
+        self.nomTraversier = self.traversier.nom
+
         self.effacerChampsTraversier()
 
 
-    # methode qui permet d'ajouter un client
-    def ajouterClient(self):
-        nomClient = self.edtNomClient.text()
-        adresseClient = self.edtAdresseClient.text()
-        villeClient = self.edtVilleClient.text()
-        codePostalClient = self.edtCodePostalClient.text()
-        provinceClient = self.edtProvinceClient.text()
-        telephoneClient = self.edtTelephoneClient.text()
-        courrielClient = self.edtCourrielClient.text()
-        noIdentificationClient = self.edtNoIdentificationClient.text()
-        if self.rdbHomme.isChecked():
-            sexeClient = "M"
-        else:
-            sexeClient = "F"
-        dateNaissanceClient = self.dateNaissance.text()
 
-        self.client = Client(nomClient, adresseClient, villeClient, codePostalClient, provinceClient, telephoneClient, courrielClient, noIdentificationClient, sexeClient, dateNaissanceClient)
-        self.listClient.addItem(str(self.client.nom) + " " + str(self.client.noIdentification))
-        self.effacerChampsClient()
 
 
        # methode qui permet d'ajouter un vehicule
@@ -121,7 +119,7 @@ class Formulaire(QtWidgets.QMainWindow):
 
 
 
-    def enregistrerXml(self, employes, fichier_xml):
+    def enregistrerXml(self,fichier_xml):
         roote = ET.Element("Traverse")
 
         # ajouter un traversier dans le fichier xml
@@ -137,43 +135,54 @@ class Formulaire(QtWidgets.QMainWindow):
         dateMiseService = ET.SubElement(traversier_xml, "dateMiseService")
         dateMiseService.text = self.traversier.dateMiseService
 
+        # pqrcourir la liste des clients et ajouter chaque client dans le fichier xml
+        # for self.client in self.clients:
+        #     client_xml = ET.SubElement(roote, "client")
+        #     client_xml.set("noClient", str(self.client.noIdentificationClient))
+        #
+        #     nom = ET.SubElement(client_xml, "nom")
+        #     nom.text = self.client.nom
+
+
+
         # Parcourir la liste des employes et ajouter chaque employe dans le fichier xml
-        for employe in employes:
+        for self.employe in self.employes:
             employe_xml = ET.SubElement(roote, "employe")
-            employe_xml.set("noEmploye", str(employe.noEmploye))
+            employe_xml.set("noEmploye", str(self.employe.noEmploye))
 
             nom = ET.SubElement(employe_xml, "nom")
-            nom.text = employe.nom
+            nom.text = self.employe.nom
 
             adresse = ET.SubElement(employe_xml, "adresse")
-            adresse.text = employe.adresse
+            adresse.text = self.employe.adresse
 
             ville = ET.SubElement(employe_xml, "ville")
-            ville.text = employe.ville
+            ville.text = self.employe.ville
 
             province = ET.SubElement(employe_xml, "province")
-            province.text = employe.province
+            province.text = self.employe.province
 
             codePostal = ET.SubElement(employe_xml, "codePostal")
-            codePostal.text = employe.codePostal
+            codePostal.text = self.employe.codePostal
 
             telephone = ET.SubElement(employe_xml, "telephone")
-            telephone.text = employe.telephone
+            telephone.text = self.employe.telephone
 
             courriel = ET.SubElement(employe_xml, "courriel")
-            courriel.text = employe.courriel
+            courriel.text = self.employe.courriel
 
             noEmploye = ET.SubElement(employe_xml, "noEmploye")
-            noEmploye.text = employe.noEmploye
+            noEmploye.text = self.employe.noEmploye
 
             nAS = ET.SubElement(employe_xml, "nAS")
-            nAS.text = employe.nAS
+            nAS.text = self.employe.nAS
 
             dateEmbauche = ET.SubElement(employe_xml, "dateEmbauche")
-            dateEmbauche.text = employe.dateEmbauche
+            dateEmbauche.text = self.employe.dateEmbauche
 
             dateArret = ET.SubElement(employe_xml, "dateArret")
-            dateArret.text = employe.dateArret
+            dateArret.text = self.employe.dateArret
+
 
             tree = ET.ElementTree(roote)
             ET.indent(roote, space="    ")
@@ -193,22 +202,97 @@ class Formulaire(QtWidgets.QMainWindow):
         nAS = self.edtNasEmploye.text()
         dateEmbauche = self.dateEmbauche.text()
         dateArret = self.dateArret.text()
-        self.employe = Employe(nom, adresse, ville, province, codePostal, telephone, courriel, noEmploye, nAS, dateEmbauche, dateArret)
-        if self.employe not in self.traversier.listEmploye:
-            self.traversier.listEmploye.append(self.employe)
-            self.employes.append(self.employe)
-            self.listEmployeTraversier.addItem(str(self.employe.noEmploye) + "-" + str(self.employe.nom))
-            self.listEmploye.addItem(str(self.employe.noEmploye) + "-" + str(self.employe.nom))
-            self.enregistrerXml(self.employes, "TransStLaurent.xml")
-            self.effacerChampsEmploye()
+
+        # si le traversier  n'existe pas
+        if self.nomTraversier is not None:
+            self.employe = Employe(nom, adresse, ville, province, codePostal, telephone, courriel, noEmploye, nAS,
+                                   dateEmbauche, dateArret)
+            if self.employe not in self.traversier.listEmploye:
+                self.traversier.listEmploye.append(self.employe)
+                self.employes.append(self.employe)
+                self.listEmployeTraversier.addItem(str(self.employe.noEmploye) + "-" + str(self.employe.nom))
+                self.listEmploye.addItem(str(self.employe.noEmploye) + "-" + str(self.employe.nom))
+                self.cboEmployeJour.addItem(str(self.employe.nom))
+                self.enregistrerXml("TransStLaurent.xml")
+                self.effacerChampsEmploye()
+            else:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Information)
+                msg.setText("Employe existe deja")
+                msg.setWindowTitle("Informations")
+                msg.setIcon(QMessageBox.Information)
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.exec_()
+
         else:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
-            msg.setText("Employe existe deja")
+            msg.setText("ajouter un traversier")
             msg.setWindowTitle("Informations")
             msg.setIcon(QMessageBox.Information)
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
+            self.effacerChampsEmploye()
+
+        # methode qui permet de créer un traverse
+    def ajouterTraverse(self):
+            noTraverse = self.edtNumeroTraverse.text()
+            villeDeDepart = self.edtVilleTraverse.text()
+            heureTraverse = self.heure.toString("hh:mm")
+            employeInscription = self.cboEmployeJour.currentText()
+            print(noTraverse, heureTraverse, villeDeDepart, employeInscription)
+            self.traverse = Traverse(noTraverse, heureTraverse, villeDeDepart, employeInscription)
+            self.numeroTraverse = str(self.traverse.noTraverse)
+
+
+    # methode qui permet d'ajouter un client
+    def ajouterClient(self):
+            nomClient = self.edtNomClient.text()
+            adresseClient = self.edtAdresseClient.text()
+            villeClient = self.edtVilleClient.text()
+            codePostalClient = self.edtCodePostalClient.text()
+            provinceClient = self.edtProvinceClient.text()
+            telephoneClient = self.edtTelephoneClient.text()
+            courrielClient = self.edtCourrielClient.text()
+            noIdentificationClient = self.edtNoIdentificationClient.text()
+            if self.rdbHomme.isChecked():
+                sexeClient = "M"
+            else:
+                sexeClient = "F"
+            dateNaissanceClient = self.dateNaissance.text()
+
+            if self.numeroTraverse is not None:
+                self.client = Client(nomClient, adresseClient, villeClient, codePostalClient, provinceClient, telephoneClient, courrielClient, noIdentificationClient, sexeClient, dateNaissanceClient)
+
+                if self.client not in self.traverse.listeClient:
+                    self.clients.append(self.client)
+                    self.traverse.listeClient.append(self.client)
+                    # self.enregistrerXml("TransStLaurent.xml")
+                    self.effacerChampsClient()
+                    # self.enregistrerXml("TransStLaurent.xml")
+                else:
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setText("Client existe deja")
+                    msg.setWindowTitle("Informations")
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setStandardButtons(QMessageBox.Ok)
+                    msg.exec_()
+                    self.effacerChampsClient()
+            else:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Information)
+                msg.setText("ajouter un traverse")
+                msg.setWindowTitle("Informations")
+                msg.setIcon(QMessageBox.Information)
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.exec_()
+                self.effacerChampsClient()
+
+
+
+
+
 
 
     def afficherFormulaireVehicule(self):
@@ -235,6 +319,7 @@ class Formulaire(QtWidgets.QMainWindow):
             self.edtImmatriculation.setEnabled(False)
             self.edtPrixTraverse.setEnabled(False)
             self.btnAjouterVehicule.setEnabled(False)
+
 
 
 

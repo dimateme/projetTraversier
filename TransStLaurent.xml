@@ -1,20 +1,20 @@
 <?xml version='1.0' encoding='utf-8'?>
 <Traverse>
     <traversier>
-        <nom>polo</nom>
+        <nom>hshs</nom>
         <capaciteVehicule>4</capaciteVehicule>
         <capacitePersonne>4</capacitePersonne>
         <anneeFabrication>2000-01-01</anneeFabrication>
         <dateMiseService>2000-01-01</dateMiseService>
     </traversier>
     <employe noEmploye="1">
-        <nom>a</nom>
-        <adresse>a</adresse>
-        <ville>a</ville>
-        <province>a</province>
-        <codePostal>a</codePostal>
-        <telephone>a</telephone>
-        <courriel>a</courriel>
+        <nom>b</nom>
+        <adresse>b</adresse>
+        <ville>b</ville>
+        <province>bb</province>
+        <codePostal>b</codePostal>
+        <telephone>b</telephone>
+        <courriel>b</courriel>
         <noEmploye>1</noEmploye>
         <nAS>1</nAS>
         <dateEmbauche>2000-01-01</dateEmbauche>
