@@ -12,7 +12,7 @@ class Type:
         return f"{self.nom} {self.nombreRoue} {self.prixTraverse}"
 
     def __eq__(self, other):
-        return self.nom == other.nom and self.prixTraverse == other.prixTraverse
+        return self.nom == other.nom
     def __hash__(self):
-        return hash((self.nom, self.prixTraverse + self.prixTraverse))
+        return hash(len(self.nom)+self.nombreRoue)
 

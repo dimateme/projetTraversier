@@ -18,6 +18,14 @@ class Traverse:
      # methode pour ajouter un vehicule à la liste des vehicules
     def ajouterVehicule(self, vehicule):
         self.listeVehicule.append(vehicule)
+
+
+    # methode qui permet de savoir si une vehicule est dans la liste
+    def estPresentVehicule(self, vehicule):
+        for self.vehicule in self.listeVehicule:
+            if vehicule in self.listeVehicule:
+                return True
+        return False
     # methode qui permet d#obtenir la liste des vehicules
     def obtenirListeVehicule(self):
         return self.listeVehicule

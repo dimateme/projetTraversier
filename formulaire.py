@@ -1,6 +1,7 @@
 import sys
 from datetime import datetime
 import datetime
+from decimal import Decimal
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QDialog,QMessageBox
@@ -11,6 +12,10 @@ from traversier import Traversier
 from client import Client
 from employe import Employe
 from xml.etree import ElementTree as ET
+
+from type import Type
+from vehicule import Vehicule
+
 
 class Formulaire(QtWidgets.QMainWindow):
 
@@ -43,6 +48,18 @@ class Formulaire(QtWidgets.QMainWindow):
         self.edtCourrielClient.clear()
         self.edtNoIdentificationClient.clear()
 
+    # methode pour effacer les champs du d'un vehicule
+    def effacerChampsVehicule(self):
+        self.edtType.clear()
+        self.edtNombreRoues.clear()
+        self.edtMarque.clear()
+        self.edtModele.clear()
+        self.edtAnnee.clear()
+        self.edtCouleur.clear()
+        self.edtNoIdentification.clear()
+        self.edtImmatriculation.clear()
+        self.edtPrixTraverse.clear()
+
 
     def etatFormulaireVehicule(self):
         self.edtType.setEnabled(False)
@@ -68,12 +85,19 @@ class Formulaire(QtWidgets.QMainWindow):
         self.btnAjouterVehicule.clicked.connect(self.ajouterVehicule)
         self.btnAjouterTraverse.clicked.connect(self.ajouterTraverse)
         self.etatFormulaireVehicule()
+        self.montantTransportParPesonne = 25
+        self.edtPrixTraverse.setReadOnly(True)
+        self.edtNombrePersonne.textChanged.connect(self.calculerMontantTransport)
+
+        self.montantTotal: Decimal
         self.heure=QTime.currentTime()
         self.edtHeureTraverse.setTime(self.heure)
-        self.clients = []
-        self.employes = []
-        self.nomTraversier = None
-        self.numeroTraverse = None
+        self.clients = [] # liste des clients
+        self.employes = []  # liste des employes
+        self.nomTraversier = None # nom du traversier
+        self.numeroTraverse = None # numero de traverse
+        self.numeroTraverse = None # numero de traverse
+
         self.show()
 
 
@@ -82,7 +106,14 @@ class Formulaire(QtWidgets.QMainWindow):
 
 
 
-
+    # methode qui permet de calculer le montant du traverse
+    def calculerMontantTransport(self):
+        self.nombrePersonne = self.edtNombrePersonne.text()
+        if self.nombrePersonne == "":
+            self.edtPrixTraverse.setText("")
+        else:
+            self.montantTotal =Decimal((self.montantTransportParPesonne) * int(self.nombrePersonne))
+            self.edtPrixTraverse.setText(str(f"${self.montantTotal:.2f}"))
 
 
 
@@ -103,7 +134,7 @@ class Formulaire(QtWidgets.QMainWindow):
 
 
 
-       # methode qui permet d'ajouter un vehicule
+    # methode qui permet d'ajouter un vehicule
     def ajouterVehicule(self):
         typeVehicule = self.edtType.text()
         nombreRoues = self.edtNombreRoues.text()
@@ -111,9 +142,45 @@ class Formulaire(QtWidgets.QMainWindow):
         modele = self.edtModele.text()
         annee = self.edtAnnee.text()
         couleur = self.edtCouleur.text()
+        # self.nombrePersonne = self.edtNombrePersonne.text()
         noIdentification = self.edtNoIdentification.text()
         immatriculation = self.edtImmatriculation.text()
-        prixTraverse = self.edtPrixTraverse.text()
+        prixTraverse = Decimal(self.montantTotal)
+        self.type=Type(typeVehicule, nombreRoues, prixTraverse)
+        print(self.type.nom, self.type.nombreRoue, marque, modele, annee, couleur, noIdentification, immatriculation, prixTraverse)
+        self.vehicule = Vehicule(self.type.nom, self.type.nombreRoue, marque, modele, annee, couleur, noIdentification, immatriculation, self.type.prixTraverse)
+        self.listVehiculeTraverse.addItem(self.vehicule.nom + "-" + self.vehicule.modele + "-" + self.vehicule.marque)
+
+        if self.numeroTraverse is not None:
+            if self.vehicule not in self.traverse.listeVehicule:
+                self.traverse.ajouterVehicule(self.vehicule)
+                self.listVehiculeTraverse.addItem(self.vehicule.nom + "-" + self.vehicule.modele + "-" + self.vehicule.marque)
+                self.effacerChampsVehicule()
+                self.etatFormulaireVehicule()
+            else:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Information)
+                msg.setText("Employe existe deja")
+                msg.setWindowTitle("Informations")
+                msg.setIcon(QMessageBox.Information)
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.exec_()
+        else:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setText("Veuillez ajouter une traverse avant d'ajouter un vehicule")
+            msg.setWindowTitle("Informations")
+            msg.setIcon(QMessageBox.Information)
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
+            self.effacerChampsVehicule()
+
+
+
+        # un compteur pour le nombre de vehicule
+
+
+
 
 
 
@@ -227,14 +294,14 @@ class Formulaire(QtWidgets.QMainWindow):
         else:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
-            msg.setText("ajouter un traversier")
+            msg.setText("ajouter un traversier avant d'ajouter un employe")
             msg.setWindowTitle("Informations")
             msg.setIcon(QMessageBox.Information)
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
             self.effacerChampsEmploye()
 
-        # methode qui permet de créer un traverse
+    # methode qui permet de créer un traverse
     def ajouterTraverse(self):
             noTraverse = self.edtNumeroTraverse.text()
             villeDeDepart = self.edtVilleTraverse.text()
@@ -242,6 +309,7 @@ class Formulaire(QtWidgets.QMainWindow):
             employeInscription = self.cboEmployeJour.currentText()
             print(noTraverse, heureTraverse, villeDeDepart, employeInscription)
             self.traverse = Traverse(noTraverse, heureTraverse, villeDeDepart, employeInscription)
+            self.numeroTraverse = str(self.traverse.noTraverse)
             self.numeroTraverse = str(self.traverse.noTraverse)
 
 
